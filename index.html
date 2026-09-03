@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>רשימת לחיצות</title>
+  <title>רשימת שמירות</title>
+
   <style>
     body{
       font-family: Arial, sans-serif;
@@ -12,6 +13,7 @@
       padding:30px;
       text-align:center;
     }
+
     .box{
       max-width:500px;
       margin:auto;
@@ -20,6 +22,15 @@
       border-radius:18px;
       box-shadow:0 4px 18px rgba(0,0,0,.12);
     }
+
+    select{
+      font-size:22px;
+      padding:12px 20px;
+      margin:10px;
+      border-radius:12px;
+      border:1px solid #ccc;
+    }
+
     button{
       font-size:22px;
       padding:14px 28px;
@@ -28,24 +39,35 @@
       border-radius:12px;
       cursor:pointer;
     }
+
     #addBtn{
       background:#222;
       color:white;
     }
+
     #clearBtn{
       background:#ddd;
     }
+
     #count{
-      font-size:28px;
-      margin:20px 0;
+      font-size:26px;
+      margin-top:20px;
       font-weight:bold;
     }
+
+    #total{
+      font-size:30px;
+      margin:10px 0;
+      font-weight:bold;
+    }
+
     #list{
       display:flex;
       flex-direction:column;
       gap:8px;
       margin-top:20px;
     }
+
     .item{
       background:#eee;
       padding:12px;
@@ -54,58 +76,150 @@
     }
   </style>
 </head>
+
 <body>
-  <div class="box">
-    <h2>רשימת לחיצות</h2>
 
-    <button id="addBtn">הוסף 1</button>
-    <button id="clearBtn">איפוס</button>
+<div class="box">
 
-    <div id="count">סה״כ: 0</div>
-    <div id="list"></div>
-  </div>
+  <h2>רשימת שמירות</h2>
 
-  <script>
-    const STORAGE_KEY = "onesList";
+  <select id="valueSelect">
+    <option value="0.05">0.05</option>
+    <option value="0.1">0.1</option>
+    <option value="0.2">0.2</option>
+    <option value="0.25">0.25</option>
+    <option value="0.3">0.3</option>
+    <option value="0.4">0.4</option>
+    <option value="0.5">0.5</option>
+    <option value="0.6">0.6</option>
+    <option value="0.7">0.7</option>
+    <option value="0.8">0.8</option>
+    <option value="0.9">0.9</option>
+    <option value="1">1.0</option>
+  </select>
 
-    let items = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  <br>
 
-    const addBtn = document.getElementById("addBtn");
-    const clearBtn = document.getElementById("clearBtn");
-    const list = document.getElementById("list");
-    const count = document.getElementById("count");
+  <button id="addBtn">שמור</button>
+  <button id="clearBtn">איפוס</button>
 
-    function save() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    }
+  <div id="count">מספר שמירות: 0</div>
+  <div id="total">סה״כ: 0</div>
 
-    function render() {
-      list.innerHTML = "";
-      count.textContent = "סה״כ: " + items.length;
+  <div id="list"></div>
 
-      items.forEach((value, index) => {
-        const div = document.createElement("div");
-        div.className = "item";
-        div.textContent = (index + 1) + ". " + value;
-        list.appendChild(div);
-      });
-    }
+</div>
 
-    addBtn.addEventListener("click", () => {
-      items.push(1);
+<script>
+
+  const STORAGE_KEY = "numbersList";
+
+  let items =
+    JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+  const valueSelect =
+    document.getElementById("valueSelect");
+
+  const addBtn =
+    document.getElementById("addBtn");
+
+  const clearBtn =
+    document.getElementById("clearBtn");
+
+  const list =
+    document.getElementById("list");
+
+  const count =
+    document.getElementById("count");
+
+  const total =
+    document.getElementById("total");
+
+
+  function save(){
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(items)
+    );
+  }
+
+
+  function formatNumber(number){
+
+    // מציג עד 2 ספרות אחרי הנקודה
+    // בלי אפסים מיותרים
+
+    return parseFloat(number.toFixed(2));
+  }
+
+
+  function render(){
+
+    list.innerHTML = "";
+
+    count.textContent =
+      "מספר שמירות: " + items.length;
+
+
+    let sum = items.reduce(
+      (a,b) => a + b,
+      0
+    );
+
+
+    total.textContent =
+      "סה״כ: " + formatNumber(sum);
+
+
+    items.forEach((value,index)=>{
+
+      const div =
+        document.createElement("div");
+
+      div.className = "item";
+
+      div.textContent =
+        (index + 1) +
+        ". " +
+        formatNumber(value);
+
+      list.appendChild(div);
+
+    });
+
+  }
+
+
+  addBtn.addEventListener("click",()=>{
+
+    const value =
+      parseFloat(valueSelect.value);
+
+    items.push(value);
+
+    save();
+    render();
+
+  });
+
+
+  clearBtn.addEventListener("click",()=>{
+
+    if(confirm("לאפס את כל הרשימה?")){
+
+      items = [];
+
       save();
       render();
-    });
 
-    clearBtn.addEventListener("click", () => {
-      if (confirm("לאפס את כל הרשימה?")) {
-        items = [];
-        save();
-        render();
-      }
-    });
+    }
 
-    render();
-  </script>
+  });
+
+
+  render();
+
+</script>
+
 </body>
 </html>
