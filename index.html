@@ -105,7 +105,12 @@
 
   <div id="count">מספר שמירות: 0</div>
   <div id="total">סה״כ: 0</div>
-
+  
+<div id="times" style="font-size:20px; margin-top:15px;">
+  <div id="firstTime">שמירה ראשונה: --:--</div>
+  <div id="lastTime">שמירה אחרונה: --:--</div>
+</div>
+  
   <div id="list"></div>
 
 </div>
@@ -142,7 +147,27 @@
       JSON.stringify(items)
     );
   }
+let firstSaveTime = localStorage.getItem("firstSaveTime");
+let lastSaveTime = localStorage.getItem("lastSaveTime");
 
+const firstTimeDisplay = document.getElementById("firstTime");
+const lastTimeDisplay = document.getElementById("lastTime");
+
+function updateTimesDisplay(){
+  firstTimeDisplay.textContent =
+    "שמירה ראשונה: " + (firstSaveTime || "--:--");
+
+  lastTimeDisplay.textContent =
+    "שמירה אחרונה: " + (lastSaveTime || "--:--");
+}
+
+function getCurrentTime(){
+  return new Date().toLocaleTimeString("he-IL", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+}
 
   function formatNumber(number){
 
@@ -194,7 +219,19 @@
 
     const value =
       parseFloat(valueSelect.value);
+    
+const currentTime = getCurrentTime();
 
+if(items.length === 0){
+  firstSaveTime = currentTime;
+  localStorage.setItem("firstSaveTime", firstSaveTime);
+}
+
+lastSaveTime = currentTime;
+localStorage.setItem("lastSaveTime", lastSaveTime);
+
+updateTimesDisplay();
+    
     items.push(value);
 
     save();
@@ -208,7 +245,13 @@
     if(confirm("לאפס את כל הרשימה?")){
 
       items = [];
+firstSaveTime = null;
+lastSaveTime = null;
 
+localStorage.removeItem("firstSaveTime");
+localStorage.removeItem("lastSaveTime");
+
+updateTimesDisplay();
       save();
       render();
 
@@ -218,7 +261,7 @@
 
 
   render();
-
+updateTimesDisplay();
 </script>
 
 </body>
