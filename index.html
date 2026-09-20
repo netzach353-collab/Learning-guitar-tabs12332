@@ -70,9 +70,26 @@ button{
   cursor:pointer;
 }
 
+.smoke-area{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
 #smokeBtn{
   background:#222;
   color:white;
+  width:100%;
+}
+
+#cigaretteAmount{
+  width:100%;
+  padding:11px 5px;
+  border:1px solid #ccc;
+  border-radius:10px;
+  background:white;
+  font-size:15px;
+  text-align:center;
 }
 
 #wakeBtn{
@@ -193,6 +210,7 @@ button{
 }
 
 @media(max-width:500px){
+
   .buttons{
     grid-template-columns:1fr;
   }
@@ -207,6 +225,7 @@ button{
 <body>
 
 <div class="top">
+
   <div class="top-inner">
 
     <h2>🚬 מעקב סיגריות</h2>
@@ -245,19 +264,75 @@ button{
 
     </div>
 
+
     <div class="buttons">
 
-      <button id="smokeBtn">
-        🚬 עישנתי
-      </button>
+      <div class="smoke-area">
+
+        <button id="smokeBtn">
+          🚬 עישנתי
+        </button>
+
+        <select id="cigaretteAmount">
+
+          <option value="1" selected>
+            1 — שלמה
+          </option>
+
+          <option value="0.9">
+            0.9
+          </option>
+
+          <option value="0.8">
+            0.8
+          </option>
+
+          <option value="0.7">
+            0.7
+          </option>
+
+          <option value="0.6">
+            0.6
+          </option>
+
+          <option value="0.5">
+            0.5 — חצי
+          </option>
+
+          <option value="0.4">
+            0.4
+          </option>
+
+          <option value="0.3">
+            0.3
+          </option>
+
+          <option value="0.25">
+            0.25 — רבע
+          </option>
+
+          <option value="0.2">
+            0.2
+          </option>
+
+          <option value="0.1">
+            0.1
+          </option>
+
+        </select>
+
+      </div>
+
 
       <button id="wakeBtn">
         ☀️ התעוררתי
       </button>
 
+
       <button id="sleepBtn">
         🌙 הלכתי לישון
       </button>
+
 
       <button id="copyBtn">
         📋 העתק את כל הנתונים
@@ -266,6 +341,7 @@ button{
     </div>
 
   </div>
+
 </div>
 
 
@@ -296,26 +372,34 @@ const STORAGE_KEY = "smokingWakeCyclesV1";
 let data;
 
 try{
+
   data = JSON.parse(
     localStorage.getItem(STORAGE_KEY)
   );
+
 }catch(e){
+
   data = null;
 }
 
+
 if(!data){
+
   data = {
     startedAt:null,
     cycles:[]
   };
+
 }
 
 
 function save(){
+
   localStorage.setItem(
     STORAGE_KEY,
     JSON.stringify(data)
   );
+
 }
 
 
@@ -337,6 +421,7 @@ function formatTime(timestamp){
         minute:"2-digit"
       }
     );
+
 }
 
 
@@ -348,6 +433,7 @@ function formatDate(timestamp){
 
   return new Date(timestamp)
     .toLocaleDateString("he-IL");
+
 }
 
 
@@ -364,6 +450,7 @@ function dayName(timestamp){
         weekday:"long"
       }
     );
+
 }
 
 
@@ -378,13 +465,27 @@ function formatDateTime(timestamp){
     " " +
     formatTime(timestamp)
   );
+
 }
 
 
-/*
-  לדוגמה:
-  2 שעות ו-7 דקות
-*/
+/* =========================================
+   הצגת כמות סיגריות
+========================================= */
+
+function formatCigaretteAmount(number){
+
+  return parseFloat(
+    Number(number).toFixed(2)
+  );
+
+}
+
+
+/* =========================================
+   זמן - שעות ודקות
+========================================= */
+
 function durationText(ms){
 
   if(
@@ -395,22 +496,32 @@ function durationText(ms){
     return "--";
   }
 
+
   const totalMinutes =
     Math.floor(ms / 60000);
+
 
   const hours =
     Math.floor(totalMinutes / 60);
 
+
   const minutes =
     totalMinutes % 60;
 
+
   if(hours === 0){
+
     return minutes + " דקות";
+
   }
 
+
   if(minutes === 0){
+
     return hours + " שעות";
+
   }
+
 
   return (
     hours +
@@ -418,13 +529,14 @@ function durationText(ms){
     minutes +
     " דקות"
   );
+
 }
 
 
-/*
-  פורמט קצר:
-  2:07
-*/
+/* =========================================
+   זמן קצר - 2:07
+========================================= */
+
 function durationShort(ms){
 
   if(
@@ -435,52 +547,65 @@ function durationShort(ms){
     return "--";
   }
 
+
   const totalMinutes =
     Math.floor(ms / 60000);
+
 
   const hours =
     Math.floor(totalMinutes / 60);
 
+
   const minutes =
     totalMinutes % 60;
+
 
   return (
     hours +
     ":" +
     String(minutes).padStart(2,"0")
   );
+
 }
 
 
-/*
-  ימים + שעות + דקות
-*/
+/* =========================================
+   ימים + שעות + דקות
+========================================= */
+
 function longDuration(ms){
 
   if(ms < 0){
     return "--";
   }
 
+
   const totalMinutes =
     Math.floor(ms / 60000);
+
 
   const days =
     Math.floor(totalMinutes / 1440);
 
+
   const remaining =
     totalMinutes % 1440;
+
 
   const hours =
     Math.floor(remaining / 60);
 
+
   const minutes =
     remaining % 60;
+
 
   return (
     days + " ימים, " +
     hours + " שעות, " +
     minutes + " דקות"
   );
+
 }
 
 
@@ -497,11 +622,15 @@ function getActiveCycle(){
   ){
 
     if(data.cycles[i].active){
+
       return data.cycles[i];
+
     }
+
   }
 
   return null;
+
 }
 
 
@@ -512,49 +641,130 @@ function getActiveCycle(){
 function ensureTrackingStarted(){
 
   if(!data.startedAt){
-    data.startedAt = Date.now();
+
+    data.startedAt =
+      Date.now();
+
   }
+
 }
 
 
 /* =========================================
-   פתיחת מחזור חדש - התעוררתי
+   כמות הסיגריות במחזור
+========================================= */
+
+function cycleCigaretteTotal(cycle){
+
+  return cycle.cigarettes.reduce(
+    (sum,cigarette)=>{
+
+      /*
+        תמיכה בנתונים ישנים.
+
+        אם הסיגריה היא רק מספר,
+        זה timestamp מהגרסה הישנה,
+        ולכן היא נחשבת סיגריה שלמה.
+      */
+
+      if(typeof cigarette === "number"){
+
+        return sum + 1;
+
+      }
+
+
+      return (
+        sum +
+        Number(cigarette.amount || 0)
+      );
+
+    },
+    0
+  );
+
+}
+
+
+/* =========================================
+   זמן של סיגריה
+========================================= */
+
+function cigaretteTime(cigarette){
+
+  /*
+    נתונים מהגרסה הישנה
+  */
+
+  if(typeof cigarette === "number"){
+
+    return cigarette;
+
+  }
+
+
+  return cigarette.time;
+
+}
+
+
+/* =========================================
+   כמות של סיגריה
+========================================= */
+
+function cigaretteAmount(cigarette){
+
+  if(typeof cigarette === "number"){
+
+    return 1;
+
+  }
+
+
+  return Number(
+    cigarette.amount || 0
+  );
+
+}
+
+
+/* =========================================
+   התעוררתי
 ========================================= */
 
 document
 .getElementById("wakeBtn")
 .addEventListener("click",()=>{
 
-  const now = Date.now();
+  const now =
+    Date.now();
+
 
   ensureTrackingStarted();
 
+
   /*
     אם קיים מחזור פעיל,
-    סוגרים אותו ברגע ההתעוררות החדשה.
-
-    כך לעולם לא יהיו שני מחזורים
-    פעילים במקביל.
+    מקפיאים אותו.
   */
 
   const oldCycle =
     getActiveCycle();
 
+
   if(oldCycle){
 
-    oldCycle.active = false;
+    oldCycle.active =
+      false;
 
-    /*
-      מקפיאים אותו בזמן האחרון
-      שבו היה פעיל.
-    */
+    oldCycle.closedAt =
+      now;
 
-    oldCycle.closedAt = now;
   }
 
 
   /*
-    פותחים מחזור ערות חדש
+    פתיחת מחזור חדש
   */
 
   data.cycles.push({
@@ -575,7 +785,13 @@ document
 
 
   save();
+
   render();
+
+
+  showToast(
+    "מחזור ערות חדש התחיל ☀️"
+  );
 
 });
 
@@ -591,10 +807,6 @@ document
   const cycle =
     getActiveCycle();
 
-  /*
-    בלי "התעוררתי" אין מחזור,
-    ולכן לא רושמים סיגריה.
-  */
 
   if(!cycle){
 
@@ -603,6 +815,7 @@ document
     );
 
     return;
+
   }
 
 
@@ -610,11 +823,40 @@ document
     Date.now();
 
 
-  cycle.cigarettes.push(now);
+  const amount =
+    parseFloat(
+      document
+      .getElementById(
+        "cigaretteAmount"
+      )
+      .value
+    );
+
+
+  /*
+    שומרים גם שעה
+    וגם כמה מהסיגריה עישנת
+  */
+
+  cycle.cigarettes.push({
+
+    time:now,
+
+    amount:amount
+
+  });
 
 
   save();
+
   render();
+
+
+  showToast(
+    "נשמר: " +
+    formatCigaretteAmount(amount) +
+    " סיגריה"
+  );
 
 });
 
@@ -630,6 +872,7 @@ document
   const cycle =
     getActiveCycle();
 
+
   if(!cycle){
 
     showToast(
@@ -637,6 +880,7 @@ document
     );
 
     return;
+
   }
 
 
@@ -644,49 +888,65 @@ document
     Date.now();
 
 
-  /*
-    שעת השינה היא נקודת הסיום
-    של הממוצע.
-  */
+  cycle.sleepTime =
+    now;
 
-  cycle.sleepTime = now;
 
-  cycle.closedAt = now;
+  cycle.closedAt =
+    now;
 
-  cycle.active = false;
+
+  cycle.active =
+    false;
 
 
   save();
+
   render();
+
+
+  showToast(
+    "המחזור נסגר 🌙"
+  );
 
 });
 
 
 /* =========================================
-   חישובי מחזור
+   סוף המחזור
 ========================================= */
 
 function cycleEndTime(cycle){
 
   /*
-    אם המחזור פעיל:
-    החישוב מגיע עד עכשיו.
-
-    אם הוא סגור:
-    משתמשים בזמן שבו נסגר.
+    אם עדיין ער:
+    עד עכשיו.
   */
 
   if(cycle.active){
+
     return Date.now();
+
   }
+
+
+  /*
+    אם יש שעת שינה:
+    זו נקודת הסיום.
+  */
 
   return (
     cycle.sleepTime ||
     cycle.closedAt ||
     cycle.wakeTime
   );
+
 }
 
+
+/* =========================================
+   זמן ערות במחזור
+========================================= */
 
 function cycleAwakeTime(cycle){
 
@@ -694,33 +954,77 @@ function cycleAwakeTime(cycle){
     cycleEndTime(cycle) -
     cycle.wakeTime
   );
+
 }
 
 
-/*
-  זה החישוב המרכזי שביקשת:
+/* =========================================
+   ממוצע המחזור
 
-  זמן מההתעוררות
-  ----------------
-  מספר הסיגריות
-
-  והוא ממשיך לגדול כל עוד
-  אתה ער ולא מעשן.
-*/
+   זמן מההתעוררות
+   חלקי כמות הסיגריות
+========================================= */
 
 function cycleAverage(cycle){
 
-  const count =
-    cycle.cigarettes.length;
+  const total =
+    cycleCigaretteTotal(cycle);
 
-  if(count === 0){
+
+  if(total <= 0){
+
     return null;
+
   }
+
 
   return (
     cycleAwakeTime(cycle) /
-    count
+    total
   );
+
+}
+
+
+/* =========================================
+   סה"כ סיגריות
+========================================= */
+
+function totalCigarettes(){
+
+  return data.cycles.reduce(
+    (sum,cycle)=>{
+
+      return (
+        sum +
+        cycleCigaretteTotal(cycle)
+      );
+
+    },
+    0
+  );
+
+}
+
+
+/* =========================================
+   זמן מאז תחילת המעקב
+========================================= */
+
+function trackingElapsed(){
+
+  if(!data.startedAt){
+
+    return 0;
+
+  }
+
+
+  return (
+    Date.now() -
+    data.startedAt
+  );
+
 }
 
 
@@ -728,46 +1032,28 @@ function cycleAverage(cycle){
    סטטיסטיקה כללית
 ========================================= */
 
-function totalCigarettes(){
-
-  return data.cycles.reduce(
-    (sum,cycle)=>
-      sum + cycle.cigarettes.length,
-    0
-  );
-}
-
-
-function trackingElapsed(){
-
-  if(!data.startedAt){
-    return 0;
-  }
-
-  return (
-    Date.now() -
-    data.startedAt
-  );
-}
-
-
 function renderStatistics(){
 
   const total =
     totalCigarettes();
+
 
   const elapsed =
     trackingElapsed();
 
 
   document
-  .getElementById("totalCigarettes")
+  .getElementById(
+    "totalCigarettes"
+  )
   .textContent =
-    total;
+    formatCigaretteAmount(total);
 
 
   document
-  .getElementById("totalCycles")
+  .getElementById(
+    "totalCycles"
+  )
   .textContent =
     data.cycles.length;
 
@@ -775,37 +1061,56 @@ function renderStatistics(){
   if(!data.startedAt){
 
     document
-    .getElementById("trackingTime")
-    .textContent = "--";
+    .getElementById(
+      "trackingTime"
+    )
+    .textContent =
+      "--";
+
 
     document
-    .getElementById("trackingDays")
-    .textContent = "--";
+    .getElementById(
+      "trackingDays"
+    )
+    .textContent =
+      "--";
+
 
     document
-    .getElementById("averagePerDay")
-    .textContent = "--";
+    .getElementById(
+      "averagePerDay"
+    )
+    .textContent =
+      "--";
+
 
     document
-    .getElementById("overallAverage")
-    .textContent = "--";
+    .getElementById(
+      "overallAverage"
+    )
+    .textContent =
+      "--";
+
 
     return;
+
   }
 
 
   /*
-    זמן מלא מתחילת המעקב
+    הזמן המלא שעבר
   */
 
   document
-  .getElementById("trackingTime")
+  .getElementById(
+    "trackingTime"
+  )
   .textContent =
     longDuration(elapsed);
 
 
   /*
-    מספר ימים מדויק
+    ימים מדויקים
   */
 
   const days =
@@ -813,7 +1118,9 @@ function renderStatistics(){
 
 
   document
-  .getElementById("trackingDays")
+  .getElementById(
+    "trackingDays"
+  )
   .textContent =
     days.toFixed(2);
 
@@ -821,39 +1128,45 @@ function renderStatistics(){
   /*
     ממוצע סיגריות ליום.
 
-    עד שלא עברה יממה,
-    לא מציגים מספר מטורף.
+    לא מציגים השלכה מטורפת
+    לפני שעברה יממה.
   */
 
   if(days >= 1){
 
     document
-    .getElementById("averagePerDay")
+    .getElementById(
+      "averagePerDay"
+    )
     .textContent =
-      (total / days)
-      .toFixed(2);
+      (
+        total / days
+      ).toFixed(2);
 
   }
   else{
 
     document
-    .getElementById("averagePerDay")
+    .getElementById(
+      "averagePerDay"
+    )
     .textContent =
       "ממתין ל־24 שעות";
+
   }
 
 
   /*
     כל הזמן שעבר
-    חלקי כל הסיגריות.
-
-    כולל שינה.
+    חלקי כמות הסיגריות הכוללת
   */
 
   if(total > 0){
 
     document
-    .getElementById("overallAverage")
+    .getElementById(
+      "overallAverage"
+    )
     .textContent =
       durationText(
         elapsed / total
@@ -863,8 +1176,12 @@ function renderStatistics(){
   else{
 
     document
-    .getElementById("overallAverage")
-    .textContent = "--";
+    .getElementById(
+      "overallAverage"
+    )
+    .textContent =
+      "--";
+
   }
 
 }
@@ -882,7 +1199,8 @@ function renderCycles(){
     );
 
 
-  container.innerHTML = "";
+  container.innerHTML =
+    "";
 
 
   if(data.cycles.length === 0){
@@ -894,37 +1212,75 @@ function renderCycles(){
       </div>
       `;
 
+
     return;
+
   }
 
 
   /*
-    החדש ביותר למעלה
+    הכרטיס החדש ביותר למעלה
   */
 
   const cycles =
-    [...data.cycles].reverse();
+    [...data.cycles]
+    .reverse();
 
 
   cycles.forEach(
-    (cycle,index)=>{
+    (cycle)=>{
+
 
       const card =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
 
       card.className =
         "card" +
-        (cycle.active ? " active" : "");
+        (
+          cycle.active
+          ? " active"
+          : ""
+        );
 
 
       const avg =
         cycleAverage(cycle);
 
 
+      const total =
+        cycleCigaretteTotal(
+          cycle
+        );
+
+
+      /*
+        מציגים:
+        שעה (כמות)
+      */
+
       const cigaretteTimes =
         cycle.cigarettes
-        .map(formatTime)
+        .map(cigarette=>{
+
+          return (
+            formatTime(
+              cigaretteTime(
+                cigarette
+              )
+            ) +
+            " (" +
+            formatCigaretteAmount(
+              cigaretteAmount(
+                cigarette
+              )
+            ) +
+            ")"
+          );
+
+        })
         .join(" • ");
 
 
@@ -937,12 +1293,15 @@ function renderCycles(){
           </div>
 
           <div class="date">
+
             ${formatDate(cycle.wakeTime)}
+
             ${
               cycle.active
               ? " • פעיל עכשיו"
               : ""
             }
+
           </div>
 
         </div>
@@ -968,11 +1327,15 @@ function renderCycles(){
           </span>
 
           <span class="value">
+
             ${
               cycle.sleepTime
-              ? formatTime(cycle.sleepTime)
+              ? formatTime(
+                  cycle.sleepTime
+                )
               : "--"
             }
+
           </span>
 
         </div>
@@ -985,11 +1348,15 @@ function renderCycles(){
           </span>
 
           <span class="value">
+
             ${
               durationText(
-                cycleAwakeTime(cycle)
+                cycleAwakeTime(
+                  cycle
+                )
               )
             }
+
           </span>
 
         </div>
@@ -998,11 +1365,17 @@ function renderCycles(){
         <div class="row">
 
           <span>
-            🚬 מספר סיגריות
+            🚬 כמות סיגריות
           </span>
 
           <span class="count">
-            ${cycle.cigarettes.length}
+
+            ${
+              formatCigaretteAmount(
+                total
+              )
+            }
+
           </span>
 
         </div>
@@ -1015,11 +1388,13 @@ function renderCycles(){
           </span>
 
           <span class="average">
+
             ${
               avg === null
               ? "--"
               : durationShort(avg)
             }
+
           </span>
 
         </div>
@@ -1027,12 +1402,14 @@ function renderCycles(){
 
         ${
           cigaretteTimes
+
           ?
+
           `
           <div class="times">
 
             <b>
-              שעות סיגריות:
+              שעות וכמויות:
             </b>
 
             <br>
@@ -1041,7 +1418,9 @@ function renderCycles(){
 
           </div>
           `
+
           :
+
           ""
         }
 
@@ -1068,6 +1447,7 @@ function renderStatus(){
       "status"
     );
 
+
   const cycle =
     getActiveCycle();
 
@@ -1078,18 +1458,21 @@ function renderStatus(){
       "אין מחזור ערות פעיל";
 
     return;
+
   }
 
 
   status.textContent =
     "🟢 ער מאז " +
-    formatTime(cycle.wakeTime);
+    formatTime(
+      cycle.wakeTime
+    );
 
 }
 
 
 /* =========================================
-   יצירת טקסט מלא להעתקה
+   טקסט מלא להעתקה
 ========================================= */
 
 function createExportText(){
@@ -1097,8 +1480,10 @@ function createExportText(){
   const total =
     totalCigarettes();
 
+
   const elapsed =
     trackingElapsed();
+
 
   const days =
     data.startedAt
@@ -1106,7 +1491,8 @@ function createExportText(){
     : 0;
 
 
-  let text = "";
+  let text =
+    "";
 
 
   text +=
@@ -1117,7 +1503,9 @@ function createExportText(){
     "תחילת המעקב: " +
     (
       data.startedAt
-      ? formatDateTime(data.startedAt)
+      ? formatDateTime(
+          data.startedAt
+        )
       : "--"
     ) +
     "\n";
@@ -1127,7 +1515,9 @@ function createExportText(){
     "זמן כולל שעבר: " +
     (
       data.startedAt
-      ? longDuration(elapsed)
+      ? longDuration(
+          elapsed
+        )
       : "--"
     ) +
     "\n";
@@ -1145,7 +1535,9 @@ function createExportText(){
 
   text +=
     "סה״כ סיגריות: " +
-    total +
+    formatCigaretteAmount(
+      total
+    ) +
     "\n";
 
 
@@ -1159,7 +1551,9 @@ function createExportText(){
 
     text +=
       "ממוצע סיגריות ליום: " +
-      (total / days).toFixed(2) +
+      (
+        total / days
+      ).toFixed(2) +
       "\n";
 
   }
@@ -1167,10 +1561,14 @@ function createExportText(){
 
     text +=
       "ממוצע סיגריות ליום: עדיין לא עברה יממה\n";
+
   }
 
 
-  if(total > 0 && data.startedAt){
+  if(
+    total > 0 &&
+    data.startedAt
+  ){
 
     text +=
       "זמן כולל חלקי סיגריות: " +
@@ -1184,6 +1582,7 @@ function createExportText(){
 
     text +=
       "זמן כולל חלקי סיגריות: --\n";
+
   }
 
 
@@ -1194,8 +1593,15 @@ function createExportText(){
   data.cycles.forEach(
     (cycle,index)=>{
 
+
       const avg =
         cycleAverage(cycle);
+
+
+      const cycleTotal =
+        cycleCigaretteTotal(
+          cycle
+        );
 
 
       text +=
@@ -1210,19 +1616,25 @@ function createExportText(){
 
       text +=
         "יום: " +
-        dayName(cycle.wakeTime) +
+        dayName(
+          cycle.wakeTime
+        ) +
         "\n";
 
 
       text +=
         "תאריך: " +
-        formatDate(cycle.wakeTime) +
+        formatDate(
+          cycle.wakeTime
+        ) +
         "\n";
 
 
       text +=
         "התעוררתי: " +
-        formatTime(cycle.wakeTime) +
+        formatTime(
+          cycle.wakeTime
+        ) +
         "\n";
 
 
@@ -1230,7 +1642,9 @@ function createExportText(){
         "הלכתי לישון: " +
         (
           cycle.sleepTime
-          ? formatTime(cycle.sleepTime)
+          ? formatTime(
+              cycle.sleepTime
+            )
           : "--"
         ) +
         "\n";
@@ -1239,14 +1653,18 @@ function createExportText(){
       text +=
         "זמן ערות: " +
         durationText(
-          cycleAwakeTime(cycle)
+          cycleAwakeTime(
+            cycle
+          )
         ) +
         "\n";
 
 
       text +=
-        "מספר סיגריות: " +
-        cycle.cigarettes.length +
+        "כמות סיגריות: " +
+        formatCigaretteAmount(
+          cycleTotal
+        ) +
         "\n";
 
 
@@ -1255,29 +1673,48 @@ function createExportText(){
         (
           avg === null
           ? "--"
-          : durationText(avg)
+          : durationText(
+              avg
+            )
         ) +
         "\n";
 
 
       text +=
-        "שעות הסיגריות: ";
+        "שעות וכמויות:\n";
 
 
       if(
         cycle.cigarettes.length === 0
       ){
 
-        text += "--\n";
+        text +=
+          "--\n";
 
       }
       else{
 
-        text +=
-          cycle.cigarettes
-          .map(formatTime)
-          .join(", ") +
-          "\n";
+        cycle.cigarettes
+        .forEach(
+          (cigarette)=>{
+
+            text +=
+              "- " +
+              formatTime(
+                cigaretteTime(
+                  cigarette
+                )
+              ) +
+              " | כמות: " +
+              formatCigaretteAmount(
+                cigaretteAmount(
+                  cigarette
+                )
+              ) +
+              "\n";
+
+          }
+        );
 
       }
 
@@ -1296,6 +1733,7 @@ function createExportText(){
 
 
   return text;
+
 }
 
 
@@ -1304,76 +1742,89 @@ function createExportText(){
 ========================================= */
 
 document
-.getElementById("copyBtn")
-.addEventListener("click",async()=>{
+.getElementById(
+  "copyBtn"
+)
+.addEventListener(
+  "click",
+  async()=>{
 
-  const text =
-    createExportText();
+
+    const text =
+      createExportText();
 
 
-  try{
+    try{
 
-    await navigator.clipboard
+      await navigator
+      .clipboard
       .writeText(text);
 
-    showToast(
-      "כל הנתונים הועתקו ✓"
-    );
 
-  }
-  catch(error){
+      showToast(
+        "כל הנתונים הועתקו ✓"
+      );
 
-    /*
-      גיבוי לדפדפנים שבהם
-      Clipboard API חסום
-    */
+    }
+    catch(error){
 
-    const textarea =
-      document.createElement(
-        "textarea"
+
+      /*
+        גיבוי במקרה שהדפדפן
+        חוסם Clipboard API
+      */
+
+      const textarea =
+        document.createElement(
+          "textarea"
+        );
+
+
+      textarea.value =
+        text;
+
+
+      textarea.style.position =
+        "fixed";
+
+
+      textarea.style.opacity =
+        "0";
+
+
+      document.body
+      .appendChild(
+        textarea
       );
 
 
-    textarea.value =
-      text;
+      textarea.select();
 
 
-    textarea.style.position =
-      "fixed";
-
-    textarea.style.opacity =
-      "0";
+      document.execCommand(
+        "copy"
+      );
 
 
-    document.body
-      .appendChild(textarea);
+      textarea.remove();
 
 
-    textarea.select();
+      showToast(
+        "כל הנתונים הועתקו ✓"
+      );
 
-
-    document.execCommand(
-      "copy"
-    );
-
-
-    textarea.remove();
-
-
-    showToast(
-      "כל הנתונים הועתקו ✓"
-    );
+    }
 
   }
-
-});
+);
 
 
 /* =========================================
    הודעה קטנה
 ========================================= */
 
-let toastTimer = null;
+let toastTimer =
+  null;
 
 
 function showToast(message){
@@ -1399,36 +1850,38 @@ function showToast(message){
 
 
   toastTimer =
-    setTimeout(()=>{
+    setTimeout(
+      ()=>{
 
-      toast.classList.remove(
-        "show"
-      );
+        toast.classList.remove(
+          "show"
+        );
 
-    },1800);
+      },
+      1800
+    );
 
 }
 
 
 /* =========================================
-   רענון
+   רענון המסך
 ========================================= */
 
 function render(){
 
   renderStatistics();
+
   renderStatus();
+
   renderCycles();
 
 }
 
 
 /*
-  בזמן שמחזור פעיל,
-  זמן הערות והממוצע צריכים
-  להמשיך לעלות גם בלי לחיצה.
-
-  לכן מרעננים כל 10 שניות.
+  כל 10 שניות הממוצע
+  וזמן הערות מתעדכנים.
 */
 
 setInterval(
