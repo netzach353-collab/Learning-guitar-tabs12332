@@ -869,35 +869,51 @@ document
 .getElementById("sleepBtn")
 .addEventListener("click",()=>{
 
-  const cycle =
-    getActiveCycle();
+  const now = Date.now();
+
+  /*
+    קודם מחפשים מחזור פעיל.
+  */
+  let cycle = getActiveCycle();
 
 
+  /*
+    אם אין מחזור פעיל,
+    משתמשים במחזור האחרון.
+
+    כך אם כבר לחצת "הלכתי לישון"
+    אבל גילית שלא נרדמת,
+    לחיצה נוספת תעדכן את שעת השינה.
+  */
   if(!cycle){
 
-    showToast(
-      "אין מחזור ערות פעיל"
-    );
+    if(data.cycles.length === 0){
 
-    return;
+      showToast(
+        "אין מחזור לעדכון"
+      );
+
+      return;
+    }
+
+    cycle =
+      data.cycles[
+        data.cycles.length - 1
+      ];
 
   }
 
 
-  const now =
-    Date.now();
+  /*
+    מעדכנים תמיד לשעת הלחיצה
+    האחרונה.
+  */
 
+  cycle.sleepTime = now;
 
-  cycle.sleepTime =
-    now;
+  cycle.closedAt = now;
 
-
-  cycle.closedAt =
-    now;
-
-
-  cycle.active =
-    false;
+  cycle.active = false;
 
 
   save();
@@ -906,7 +922,9 @@ document
 
 
   showToast(
-    "המחזור נסגר 🌙"
+    "שעת השינה עודכנה ל־" +
+    formatTime(now) +
+    " 🌙"
   );
 
 });
